@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¿Verdadero o Falso? - Juego para Niños 👧🧒</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-yellow-100 to-pink-200 min-h-screen flex flex-col items-center justify-center text-center p-4">
+  
+  <div class="max-w-xl w-full bg-white shadow-2xl rounded-2xl p-6 space-y-4">
+    <h1 class="text-3xl font-bold text-pink-700">🧠 ¿Verdadero o Falso?</h1>
+    
+    <div id="instrucciones" class="text-gray-700 text-base">
+      <p>Lee la frase y decide si es verdadera ✅ o falsa ❌.</p>
+      <p>¡Cuanto más rápido aciertes, más puntos ganas! ⏱️</p>
+      <p class="mt-2">Haz clic en "Comenzar" para empezar. ¡Diviértete! 🎉</p>
+    </div>
+
+    <div id="pregunta" class="text-xl font-semibold text-gray-800 hidden"></div>
+
+    <div id="botones" class="flex justify-around mt-4 hidden">
+      <button onclick="responder(true)" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-lg">✅ Verdadero</button>
+      <button onclick="responder(false)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-lg">❌ Falso</button>
+    </div>
+
+    <div id="puntaje" class="text-pink-700 font-semibold text-lg hidden"></div>
+    <div id="resultado" class="text-lg mt-2 font-medium"></div>
+    <button onclick="comenzarJuego()" id="btnComenzar" class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 rounded-xl text-lg">🎮 Comenzar</button>
+  </div>
+
+  <script>
+    const bancoTotal = [
+      { texto: "🐶 Los perros pueden ladrar.", respuesta: true, dato: "¡Claro! Ladrar es su forma de comunicarse." },
+      { texto: "🌞 El Sol es frío.", respuesta: false, dato: "El Sol está muy caliente, ¡más de 5.000°C!" },
+      { texto: "🍎 Las manzanas crecen en los árboles.", respuesta: true, dato: "Las manzanas son frutas de árbol." },
+      { texto: "🐘 Los elefantes son más pequeños que los gatos.", respuesta: false, dato: "¡Son mucho más grandes!" },
+      { texto: "🚀 Los cohetes viajan al espacio.", respuesta: true, dato: "Así es, ¡nos ayudan a explorar el espacio!" },
+      { texto: "🐟 Los peces pueden vivir fuera del agua.", respuesta: false, dato: "Necesitan agua para respirar." },
+      { texto: "🎈 Un globo lleno de aire puede volar.", respuesta: true, dato: "¡Sí! Si es ligero, puede flotar en el aire." },
+      { texto: "🌧️ Cuando llueve, el suelo se moja.", respuesta: true, dato: "La lluvia moja todo lo que toca." },
+      { texto: "🐱 Los gatos tienen seis patas.", respuesta: false, dato: "Tienen cuatro patitas." },
+      { texto: "🥕 Las zanahorias son verdes.", respuesta: false, dato: "Normalmente son naranjas." },
+      { texto: "🦁 El león es conocido como el rey de la selva.", respuesta: true, dato: "¡Así lo llaman por su fuerza y presencia!" },
+      { texto: "🌈 Un arcoíris tiene solo el color rojo.", respuesta: false, dato: "Tiene muchos colores: rojo, naranja, amarillo, verde, azul, añil y violeta." },
+      { texto: "🚲 Una bicicleta tiene dos ruedas.", respuesta: true, dato: "¡Por eso se llama bi-cicleta!" },
+      { texto: "⛄ La nieve es caliente.", respuesta: false, dato: "La nieve es muy fría, ¡puede derretirse en tu mano!" },
+      { texto: "🦆 Los patos pueden nadar.", respuesta: true, dato: "Sus patas palmeadas los ayudan a nadar muy bien." },
+      { texto: "🌌 La luna es más grande que la Tierra.", respuesta: false, dato: "¡Es mucho más pequeña!" },
+      { texto: "🥛 La leche viene de las vacas.", respuesta: true, dato: "Sí, también puede venir de otros animales." },
+      { texto: "🦓 Las cebras tienen rayas blancas y negras.", respuesta: true, dato: "Sus rayas son únicas como una huella digital." },
+      { texto: "🚦El semáforo tiene colores morado, gris y marrón.", respuesta: false, dato: "Tiene rojo, amarillo y verde." },
+      { texto: "🎂 Un pastel de cumpleaños se come con cuchara.", respuesta: true, dato: "¡O con tenedor... o con las manos si eres travieso!" },
+      { texto: "🧃 El jugo de naranja es azul.", respuesta: false, dato: "¡No! Es de color naranja, como su fruta." }
+    ];
+
+    let bancoDisponible = [...bancoTotal]; // Copia para trabajar
+    let preguntas = [];
+    let preguntasAnteriores = [];
+    let puntaje = 0;
+    let preguntaActual = 0;
+    let tiempoInicio = 0;
+    const preguntasPorJuego = 8;
+
+    function comenzarJuego() {
+      // Si no quedan suficientes preguntas, reiniciar banco
+      if (bancoDisponible.length < preguntasPorJuego) {
+        bancoDisponible = [...bancoTotal];
+        preguntasAnteriores = [];
+      }
+
+      // Elegir nuevas preguntas sin repetir las anteriores inmediatas
+      preguntas = bancoDisponible
+        .filter(p => !preguntasAnteriores.includes(p.texto))
+        .sort(() => 0.5 - Math.random())
+        .slice(0, preguntasPorJuego);
+
+      // Actualizar listas
+      preguntasAnteriores = preguntas.map(p => p.texto);
+      bancoDisponible = bancoDisponible.filter(p => !preguntasAnteriores.includes(p.texto));
+
+      puntaje = 0;
+      preguntaActual = 0;
+      document.getElementById("resultado").textContent = "";
+      document.getElementById("btnComenzar").classList.add("hidden");
+      document.getElementById("puntaje").classList.remove("hidden");
+      document.getElementById("instrucciones").classList.add("hidden");
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      if (preguntaActual >= preguntas.length) {
+        document.getElementById("pregunta").textContent = "🎉 ¡Juego terminado!";
+        document.getElementById("botones").classList.add("hidden");
+        document.getElementById("resultado").textContent = `Puntuación final: ${puntaje} puntos 🎯`;
+        document.getElementById("btnComenzar").textContent = "🔁 Jugar de nuevo";
+        document.getElementById("btnComenzar").classList.remove("hidden");
+        return;
+      }
+      const p = preguntas[preguntaActual];
+      document.getElementById("pregunta").textContent = p.texto;
+      document.getElementById("botones").classList.remove("hidden");
+      document.getElementById("pregunta").classList.remove("hidden");
+      document.getElementById("resultado").textContent = "";
+      tiempoInicio = Date.now();
+    }
+
+    function responder(eleccion) {
+      const tiempoFin = Date.now();
+      const segundos = (tiempoFin - tiempoInicio) / 1000;
+      const p = preguntas[preguntaActual];
+
+      let puntosGanados = 0;
+      if (eleccion === p.respuesta) {
+        if (segundos < 3) {
+          puntosGanados = 10;
+        } else if (segundos < 6) {
+          puntosGanados = 5;
+        } else {
+          puntosGanados = 2;
+        }
+        puntaje += puntosGanados;
+        document.getElementById("resultado").textContent = `✅ ¡Correcto! +${puntosGanados} puntos. Dato: ${p.dato}`;
+      } else {
+        document.getElementById("resultado").textContent = `❌ Incorrecto. Dato: ${p.dato}`;
+      }
+
+      document.getElementById("puntaje").textContent = `Puntos: ${puntaje}`;
+      preguntaActual++;
+      setTimeout(mostrarPregunta, 2500);
+    }
+  </script>
+
+</body>
+</html>
