@@ -29,3 +29,5 @@ Lo mejor: usa **Inteligencia Artificial** para crear preguntas geniales y entend
 - Creé la interfaz con HTML, CSS y JavaScript para que sea muy intuitiva.  
 - ¡Listo para que los peques aprendan jugando!
 
+## 4. ¿Cómo lo visualizas?
+- Descargalo y dale doble click. ¡A jugar!
